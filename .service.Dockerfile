@@ -1,0 +1,24 @@
+FROM mhart/alpine-node:10
+
+WORKDIR /usr
+
+# COPY package.json .
+# COPY yarn.lock .
+# COPY .env .
+# COPY prisma.yml . 
+# COPY .wait-for-it.sh .
+# COPY src/ ./src/ 
+
+COPY . .
+
+RUN apk add --no-cache bash #Need this for alpine-node
+RUN yarn global add concurrently
+RUN yarn global add prisma
+RUN chmod +x ./.wait-for-it.sh
+RUN yarn install
+ENV PRISMA_MANAGEMENT_API_SECRET="XmHeMLxKF2t35bLHBcrHFG0tBsGN38GAEXLtCJm36csWIOhsWMcxF6pFvz7v73xUhqkTh3ahAATr7h2hP2K2f9UyYqMOWBBmfD+rVZ1Px9A6z4ZkpLlOpyUOiusLeF9AcrNRsKbKND8O5HuGtnIMPXW+mCfcfycXnfmdxKeBu1mHCzPXzaZzn+x/zv1D2/rp78nuyQUAfz9jsP8VwCg3EzoGsx2QpV81uXIoyXznZ1X9xGyyq9VT4T/7Q7cYh/yj3nHiO1n+L+U90ZrE/Nps6xskeDghDOBjfZEEhNzipoCkhUuMNQ/nLHU+4DKVjmZzvj10tAUZ1kj0uMQhE+G6Og=="
+ENV managementApiSecret="XmHeMLxKF2t35bLHBcrHFG0tBsGN38GAEXLtCJm36csWIOhsWMcxF6pFvz7v73xUhqkTh3ahAATr7h2hP2K2f9UyYqMOWBBmfD+rVZ1Px9A6z4ZkpLlOpyUOiusLeF9AcrNRsKbKND8O5HuGtnIMPXW+mCfcfycXnfmdxKeBu1mHCzPXzaZzn+x/zv1D2/rp78nuyQUAfz9jsP8VwCg3EzoGsx2QpV81uXIoyXznZ1X9xGyyq9VT4T/7Q7cYh/yj3nHiO1n+L+U90ZrE/Nps6xskeDghDOBjfZEEhNzipoCkhUuMNQ/nLHU+4DKVjmZzvj10tAUZ1kj0uMQhE+G6Og=="
+ENV APP_SECRET="MEYDHG+qP3X4cY80O2c8mMP4N/KTN5JSyaVpuOyFn4WgJYWjlWTStS4Myp8++7MokxxfvdTc5tAP4ULXwAzGD9CaA7xbgKJHu/b7Vp0u4y7VYyDCtTFx3LmMAIlyaDZlee43GmAjpX9HqRnwFAexxsy2/DYdpNKV1ZMIYiBVbTJ9ecnZ4YU9waacBTL/Y9HJABbCP0HJAMQVRoJNiS+xsAsFnkQrP9ZV9IoKfDGRW991XBnU493YmlzNlj6h3oWphYt0Qadtl5vpDBAUmuTX3jgTQnST9Jrz7eeSKAeODGeGl9D1IYlH6gXLlKAyA6wxss17rgyh8wj820J6FFjAPw=="
+ENV PRISMA_SECRET="p3Pfs4PbYlsSn1gv1775CoJ4vyNmiJykGx0BbYaqpLVUqBJBTfc4fsOIlY27tYtS1eB3HgyuM2/axPhjYkxLsflew3EfQtGAIho+Z1Ycfv/h5AnpJhVUbV625BINx+dEVT7M94oMguKWdGcHjEblEP/le5i/Br2A3O/IxOUzJpCEt5J8MYW4NNwBbKv8MXbpqJkBjH5beDaKUdbGm4YCqYZ9P2vXeEY3E87bpIPAP/rbRb8SixBUOSbyR9wfV0WRJNFCXCXD9V5m31hKvuB8NgSaupa/dq9nXuiXdxMPRuycUsqkF7eHU80APqCeh+k9pCZzygKeVGwqW4j2AgR9YQ=="
+
+EXPOSE 4000

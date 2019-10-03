@@ -1,0 +1,99 @@
+{
+  "name": "server",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "npm run start:dev",
+    "start": "npm run start:prod",
+    "start:dev": "npm-run-all --serial start:docker:db start:liveReload playground",
+    "start:prod": "npm-run-all --serial start:docker:all",
+    "build": "npm run docker:rebuild:db",
+    "clean": "npm run docker:destroy:allContainers",
+    "start:docker:db": "PRISMA_ENDPOINT=http://localhost:4466 npm-run-all --serial docker:compose:db start:liveReload",
+    "start:docker:all": "PRISMA_ENDPOINT=http://prisma:4466 npm run docker:compose:all",
+    "start:docker:entrypoint": "babel-node src/service/index.js",
+    "start:vanilla": "babel-node src/service/index.js",
+    "start:liveReload": "nodemon --watch src/service/index.js --exec 'babel-node src/service/index.js'",
+    "playground": "graphql playground",
+    "docker:compose:db": "docker-compose -f src/database/docker-compose.db.yml up -d",
+    "docker:compose:all": "docker-compose -f .docker-compose.all.yml up -d",
+    "docker:destroy:allContainers": "docker rm -f $(docker ps -aqf 'name=prisma')",
+    "docker:rebuild:db": "docker-compose -f src/database/docker-compose.db.yml up -d --force-recreate --build",
+    "docker:rebuild:all": "docker-compose -f .docker-compose.all.yml up -d --force-recreate --build",
+    "test": " npm run test:ava:watch",
+    "test:all": "npm-run-all --serial docker:compose:all test:ava",
+    "test:all:fresh": "npm-run-all --serial clean build test:ava",
+    "test:db": " npm run test:ava:watch",
+    "test:ava": "ava",
+    "test:ava:watch": "ava --watch",
+    "ci:remote": "npm run test:all",
+    "pdpg": "prisma deploy && prisma generate"
+  },
+  "dependencies": {
+    "bcryptjs": "2.4.3",
+    "graphql-yoga": "1.17.4",
+    "jsonwebtoken": "8.5.1",
+    "prisma": "^1.34.7",
+    "prisma-binding": "2.3.11",
+    "graphql": "14.5.3",
+    "graphql-tag": "2.10.1",
+    "graphql-tools": "4.0.5",
+    "nodemailer": "^6.3.0",
+    "prisma-client-lib": "1.34.6"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "ava": "^2.0.0",
+    "babel-plugin-dotenv": "^0.1.1",
+    "delay": "^4.2.0",
+    "dotenv": "8.0.0",
+    "graphql-cli": "^3.0.11",
+    "graphql-request": "^1.8.2",
+    "is-reachable": "^3.1.0",
+    "is-travis": "^2.0.0",
+    "moment": "^2.24.0",
+    "nodemon": "^1.19.1",
+    "npm-run-all": "4.1.5",
+    "npm-starter-sample-module": "^0.0.4",
+    "@types/bcryptjs": "2.4.2",
+    "@types/is-reachable": "^3.1.0",
+    "@types/jsonwebtoken": "8.3.3",
+    "@types/moment": "^2.13.0",
+    "ts-node": "7.0.1",
+    "typescript": "3.5.3"
+  },
+  "ava": {
+    "files": [
+      "src/service/tests/**.js"
+    ],
+    "require": [
+      "@babel/polyfill",
+      "@babel/register"
+    ],
+    "verbose": true
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "9.3.0"
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      [
+        "babel-plugin-dotenv",
+        {
+          "replacedModuleName": "babel-dotenv"
+        }
+      ]
+    ]
+  }
+}

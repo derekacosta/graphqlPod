@@ -1,0 +1,49 @@
+version: "3"
+services:
+  prisma:
+    image: "prismagraphql/prisma:1.30"
+    restart: always
+    ports:
+      - "4466:4466"
+    depends_on:
+      - mongo
+    environment:
+      PRISMA_CONFIG: |
+        port: 4466
+        # uncomment the next line and provide the env var PRISMA_MANAGEMENT_API_SECRET=my-secret to activate cluster security
+        managementApiSecret: ${PRISMA_MANAGEMENT_API_SECRET}
+        databases:
+          default:
+            rawAccess: false
+            connector: mongo
+            uri: 'mongodb://prisma:prisma@mongo'
+  mongo:
+    image: mongo:4.0.5
+    # Uncomment the next two lines to connect to your your database from outside the Docker environment, e.g. using a database GUI like Compass
+    # ports:
+    # - "27017:27017"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: prisma
+      MONGO_INITDB_ROOT_PASSWORD: prisma
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo:/var/lib/mongo
+  prisma-service:
+    build:
+      context: .
+      dockerfile: .service.Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      PRISMA_ENDPOINT: "http://prisma:4466"
+      PRISMA_CLUSTER: local
+      PRISMA_SECRET: ${PRISMA_SECRET}
+    depends_on:
+      - prisma
+      - mongo
+    command: './.wait-for-it.sh prisma:4466 -- concurrently "prisma cluster-token" "prisma token" "prisma generate" "prisma deploy" "yarn run start:docker:entrypoint"'
+    restart: "no"
+volumes:
+  mongo:
